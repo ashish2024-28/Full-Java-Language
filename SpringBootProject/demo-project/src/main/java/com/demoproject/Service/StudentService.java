@@ -1,44 +1,178 @@
 package com.demoproject.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.demoproject.Entity.Role;
 import com.demoproject.Entity.Student;
-import com.demoproject.Repository.StudentRepo;
+import com.demoproject.Entity.Home.University;
+import com.demoproject.Repository.StudentRepository;
+import com.demoproject.Repository.Home.UniversityRepo;
 
 @Service
 public class StudentService {
 
-  private final StudentRepo repo;
 
-    public StudentService(StudentRepo repo) {
-        this.repo = repo;
+    @Autowired
+    private StudentRepository repo;
+    @Autowired
+    private UniversityRepo universityRepo;
+    
+
+    // private StudentRepository repo;
+    // public StudentService(StudentRepository repo)  {
+    //     this.repo = repo;
+    // }
+
+
+    //  Login by domain + Gmail + Password
+    public Student LoginStudent(String domain, Student loginstudent){
+        Student studentG = repo.findByEmailAndDomain(loginstudent.getEmail(),domain);
+        Student studentP = repo.findByEmailAndPassword(loginstudent.getEmail(),loginstudent.getPassword());
+        // if ((studentG.getDomain() == studentP.getDomain() && studentG.getEmail() == studentP.getEmail())&& studentG.getPassword() == studentP.getPassword()) {
+        // if ((studentG.getDomain().equals(studentP.getDomain()) && studentG.getEmail().equals(studentP.getEmail()))&& studentG.getPassword().equals(studentP.getPassword())) {
+        if ((Objects.equals(studentG.getDomain(), studentP.getDomain()) && Objects.equals(studentG.getEmail(), studentP.getEmail()))&& Objects.equals(studentG.getPassword(), studentP.getPassword())) {
+
+            studentG.setLastLoginDateTime(LocalDateTime.now());
+            return repo.save(studentG);
+            
+        } else {
+            return null;
+        }
     }
 
-    public Student addStudent(Student s) {
-        return repo.save(s); // sends to db
+
+    // ---- CREATE ------
+    public String addStudent(String domain, Student s) {
+        
+        University university = universityRepo.findByDomain(domain);
+        if (university == null) {   return "University not found for domain: " + domain;    }
+        s.setDomain(domain);
+
+        if( repo.existsByRollNumberAndDomain(s.getRollNumber(),s.getDomain()) ){    return "Student's RollNumber field are already exist. ";    }
+        if( repo.existsByDomainAndEmail(s.getDomain(),s.getEmail()) ){    return "Student's Email field are already exist. ";    }
+        if( repo.existsByEmail(s.getEmail())){ return "Enter Unique Email Id or Another Email Id . ";  }
+        
+        s.setRole(Role.STUDENT);
+        s.setUniversity(university);
+        Student save = repo.save(s);
+        return save.getName() + ",\nYou Account is Created Successfully.\nRoll Number : " + save.getRollNumber() ;
+
     }
 
-    public List<Student> getAll() {
-        return repo.findAll();
+    // ------ READ ALL student for specific university ------
+    public List<Student> getAllStudent(String domain) {
+        return repo.findAllByDomain(domain);
     }
 
-    public Student getById(Long id) {
-        return repo.findById(id).orElse(null);
+    // READ ONE by domain + id
+    // **** this is for official use only no others  ***** 
+    public Student getById(String domain, Long id) {
+        return repo.findByIdAndDomain(id, domain);
     }
 
-    public Student updateStudent(Student s) {
-        return repo.save(s);
+    // ------ READ ONE by domain + rollNo ------
+    public Student getStudentByRollNo(String domain, String rollNumber) {
+        return repo.findByRollNumberAndDomain(rollNumber, domain);        
+    }
+    
+    // ------ READ ONE by domain + Email ------
+    public Student getStudentByEmail(String email, String domain) {
+        
+        Student student  = repo.findByEmailAndDomain(email, domain);        
+        return repo.save(student);
+    }
+    
+    // ------ READ All by domain + Name ------
+    public List<Student> getAllStudentByName(String domain,String name) {
+        return repo.findAllByNameAndDomain(name, domain);
+    }
+    
+    // ------ READ All by domain + Branch ------
+    public List<Student> getAllStudentByBranch(String domain,String branch) {
+        return repo.findAllByBranchAndDomain(branch, domain);
     }
 
-    public String deleteStudent(Long id) {
-        repo.deleteById(id);
-        return "Student deleted with id " + id;
+    // ------ READ All by domain + Course ------
+    public List<Student> getAllStudentByCourse(String domain,String course) {
+        return repo.findAllByCourseAndDomain(course, domain);
     }
+
+    // ------ READ All by domain + Batch ------
+    public List<Student> getAllStudentByBatch(String domain,String batch) {
+        return repo.findAllByBatchAndDomain(batch, domain);
+    }
+
+    // Update Password or Forget Password
+     public boolean updatePasswordByEmail(String domain, String email, String newPass ) {
+        Student old = repo.findByEmailAndDomain(email, domain);
+        if (old == null) return false;
+
+        old.setPassword(newPass);
+        repo.save(old);
+        return true;
+    }
+
+    // ------ UPDATE by id ------
+    // **** this is for official use only no others  ***** 
+    public Student updateStudentById(String domain, Long id, Student s) {
+        Student old = repo.findByIdAndDomain(id, domain);
+        if (old == null) return null;
+
+        old.setName(s.getName());
+        old.setBranch(s.getBranch());
+        old.setCourse(s.getCourse());
+        old.setBatch(s.getBatch());
+        old.setMobileNumber(s.getMobileNumber());
+        old.setFatherName(s.getFatherName());
+        old.setFatherMobNo(s.getFatherMobNo());
+
+        return repo.save(old);
+    }
+
+
+    // ------ UPDATE  by Email ------
+    public Boolean updateStudentByEmail(String domain, Student s) {
+        Student old = repo.findByEmailAndDomain(s.getEmail(), domain);
+        if (old == null) return false;
+
+        old.setName(s.getName());
+        old.setBranch(s.getBranch());
+        old.setCourse(s.getCourse());
+        old.setBatch(s.getBatch());
+        old.setMobileNumber(s.getMobileNumber());
+        old.setFatherName(s.getFatherName());
+        old.setFatherMobNo(s.getFatherMobNo());
+
+        repo.save(old);
+        return true;
+    }
+
+    // ------ DELETE by id ------
+    // **** this is for official use only no others  ***** 
+    public String deleteStudentbyId(String domain, Long id) {
+        Student s = repo.findByIdAndDomain(id, domain);
+        if (s == null) return "Invalid student";
+        
+        repo.delete(s);
+        return "Deleted student with id " + id;
+    }
+
+    // ------ DELETE By RollNo ------
+    public String deleteStudentByEmail(String domain, String email) {
+        Student s = repo.findByRollNumberAndDomain(email, domain);
+        if (s == null) return "Invalid student";
+        String rollno = s.getRollNumber();
+        repo.delete(s);
+        return "Deleted student with RollNo " + rollno;
+    }
+
+
+  
+
 
 }
-
-// @Service → tells Spring it is business logic layer. It calls the repository to interact with DB.
-
-// repo.save() → automatically INSERT or UPDATE depending on presence of ID.

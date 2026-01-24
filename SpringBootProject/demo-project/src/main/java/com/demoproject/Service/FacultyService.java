@@ -1,54 +1,183 @@
 package com.demoproject.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.demoproject.Entity.Faculty;
+import com.demoproject.Entity.Role;
+import com.demoproject.Entity.Student;
+import com.demoproject.Entity.Home.University;
 import com.demoproject.Repository.FacultyRepository;
+import com.demoproject.Repository.Home.UniversityRepo;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class FacultyService {
 
-      private final FacultyRepository frepo;
 
-    public FacultyService(FacultyRepository frepo) {
-        this.frepo = frepo;
-    }
+    @Autowired
+    private StudentService studentService;
+    @Autowired
+    private FacultyRepository frepo;
+    
+    @Autowired
+    private UniversityRepo universityRepo;
 
-    public Faculty addFaculty(Faculty s) {
-        return frepo.save(s); // sends to db
-    }
-
-    public List<Faculty> getAll() {
-        return frepo.findAll();
-    }
-
-    public Faculty getById(Long id) {
-        return frepo.findById(id).orElse(null);
-    }
-
-    public Faculty updateFaculty(Faculty s) {
-        return frepo.save(s);
-    }
-
-    public String deleteFaculty(Long id) {
-        frepo.deleteById(id);
-        return "Faculty deleted with id " + id;
-    }
-
-    // public Faculty addFaculty(Faculty s) {
-    //     // TODO Auto-generated method stub
-    //     throw new UnsupportedOperationException("Unimplemented method 'addFaculty'");
+    // private final FacultyRepository frepo;
+    // public FacultyService(FacultyRepository frepo) {
+    //     this.frepo = frepo;
     // }
 
-    // public String deleteFaculty(Long id) {
-    //     // TODO Auto-generated method stub
-    //     throw new UnsupportedOperationException("Unimplemented method 'deleteFaculty'");
-    // }
+    //  Login by domain + Gmail + Password
+    public Faculty LoginFaculty(String domain, Faculty loginFaculty){
+        Faculty facultyG = frepo.findByEmailAndDomain(loginFaculty.getEmail(),domain);
+        Faculty facultyP = frepo.findByEmailAndPassword(loginFaculty.getEmail(),loginFaculty.getPassword());
+        // if ((facultyG.getDomain() == facultyP.getDomain() && facultyG.getGmail() == facultyP.getGmail())&& facultyG.getPassword() == facultyP.getPassword()) {
+        if ((Objects.equals(facultyG.getDomain(), facultyP.getDomain()) && Objects.equals(facultyG.getEmail(), facultyP.getEmail()))&& Objects.equals(facultyG.getPassword(), facultyP.getPassword())) {
+            facultyG.setLastLoginDateTime(LocalDateTime.now());
+            return frepo.save(facultyG);
+            
+        } else {
+            return null;
+        }
+    }
+
+    // ---- CREATE ------
+    public String addFaculty(String domain, Faculty f) {
+        
+        University university = universityRepo.findByDomain(domain);
+        if (university == null) {   return "University not found for domain: " + domain;    }
+        f.setDomain(domain);
+
+        if( frepo.existsByFacultyIdAndDomain(f.getFacultyId(),f.getDomain()) ){    return "Faculty's Id field are already exist. ";  }
+        if( frepo.existsByDomainAndEmail(f.getDomain(),f.getEmail()) ){    return "Faculty's Email field are already exist. ";  }
+        if( frepo.existsByEmail(f.getEmail())){ return "Enter Unique Email Id or Another Email Id . ";  }
+       
+        f.setRole(Role.FACULTY);
+        f.setUniversity(university);
+        Faculty save = frepo.save(f);
+        return save.getName() + ",\nYou Account is Created Successfully.\nFaculty Id : " + save.getFacultyId() ;
+      
+    }
+
+    // ------ READ ALL faculty for specific university ------
+    public List<Faculty> getAll(String domain) {
+        return frepo.findByDomain(domain);
+    }
+
+    // ------ READ ONE by domain + id  ------
+    // **** this is for official use only no others  ***** 
+    public Faculty getById(String domain, Long id) {
+        return frepo.findByIdAndDomain(id, domain);
+    }
+    
+    //  READ ONE by domain + DomainId means (Id which provide by University or collage)
+    public Faculty getFacultyByFacultyId(String domain, String facultyId ) {
+        return frepo.findByFacultyIdAndDomain(facultyId, domain);
+    }
+
+    //  READ ONE by domain + gmail
+    public Faculty getFacultyByGmail(String domain, String gmail ) {
+        Faculty faculty = frepo.findByEmailAndDomain(gmail, domain); 
+        return frepo.save(faculty);
+    }
+    
+    // Update Password or Forget Password
+     public boolean updatePasswordByEmail(String domain, String email, String newPass ) {
+        Faculty old = frepo.findByEmailAndDomain(email, domain);
+        if (old == null) return false;
+
+        old.setPassword(newPass);
+        frepo.save(old);
+        return true;
+
+    }
+
+    // ------ UPDATE by id ------
+    // **** this is for official use only no others  ***** 
+    public Faculty updateFaculty(String domain, Long id, Faculty f) {
+        Faculty old = frepo.findByIdAndDomain(id, domain);
+        if (old == null) return null;
+        
+        old.setName(f.getName());
+        old.setCourse(f.getCourse());
+        old.setTeachingBatch(f.getTeachingBatch());
+        old.setMobileNumber(f.getMobileNumber());
+        
+        return frepo.save(old);
+    }
+
+    // ------ UPDATE by Did (Domain id) ------
+    public Boolean updateFacultyByFacultyId(String domain, Faculty f) {
+        Faculty old = frepo.findByFacultyIdAndDomain(f.getFacultyId(), domain);
+        if (old == null) return false;
+        
+        old.setName(f.getName());
+        old.setCourse(f.getCourse());
+        old.setTeachingBatch(f.getTeachingBatch());
+        old.setMobileNumber(f.getMobileNumber());
+        
+        frepo.save(old);
+        return true;
+    }
+
+    
+    // ------ DELETE by id  ------
+    // **** this is for official use only no others  ***** 
+    public String deleteFacultyById(String domain, Long id) {
+        Faculty f = frepo.findByIdAndDomain(id, domain);
+        if (f == null) return "Invalid faculty ID";
+        frepo.delete(f);
+        return "Deleted faculty with id " + id;
+    }
+
+    // ------ DELETE by Did (Domain Id) ------
+    public String deleteFacultyByFacultyId(String domain, String facultyId) {
+        Faculty f = frepo.findByFacultyIdAndDomain(facultyId, domain);
+        if (f == null) return "Invalid faculty ID";
+        frepo.delete(f);
+        return "Deleted faculty with id " + facultyId ;
+    }
+   
+
+
+    
+    // ------ READ ALL student for specific university ------
+    public List<Student> getAllStudents(String domain) {
+        return studentService.getAllStudent(domain);
+    }
+
+    // ------ READ ONE by domain + rollNo ------
+    public Student getStudentByRollNo(String domain, String rollNo) {
+        return studentService.getStudentByRollNo(domain, rollNo);        
+    }
+    
+    // ------ READ ONE by domain + Name ------
+    public List<Student> getAllStudentByName(String domain, String name) {
+        return studentService.getAllStudentByName(domain, name);        
+    }
+
+    // ------ READ All by domain + Branch ------
+    public List<Student> getStudentByBranch(String domain,String branch) {
+        return studentService.getAllStudentByBranch(domain,branch);
+    }
+
+    // ------ READ All by domain + Course ------
+    public List<Student> getStudentByCourse(String domain,String course) {
+        return studentService.getAllStudentByCourse(domain,course);
+    }
+    
+    // ------ READ All by domain + Batch ------
+    public List<Student> getStudentByBatch(String domain, String batch) {
+        return studentService.getAllStudentByBatch(domain, batch);
+    }
+
+
 
 }
-
-// @Service → tells Spring it is business logic layer. It calls the repository to interact with DB.
-
-// repo.save() → automatically INSERT or UPDATE depending on presence of ID.

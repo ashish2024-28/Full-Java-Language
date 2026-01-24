@@ -31,3 +31,45 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Maven Build
+target/
+
+# hide application.properties
+src/main/resources/application.properties
+
+
+# Maven Wrapper (Keep these files!)
+!.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+mvnw
+mvnw.cmd
+
+# Logs
+*.log
+
+# IntelliJ
+.idea/
+*.iml
+out/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Java
+*.class
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+

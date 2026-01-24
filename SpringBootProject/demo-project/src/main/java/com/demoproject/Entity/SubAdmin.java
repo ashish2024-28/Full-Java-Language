@@ -1,56 +1,40 @@
 package com.demoproject.Entity;
 
+import com.demoproject.Entity.Home.University;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.Data;
 
 @Entity
-public class SubAdmin {
+@Table(name = "sub_admin",
+uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@Data
+public class SubAdmin extends BaseUser {
     
-    @Id
-    @GeneratedValue
-    private Long id;
-    private String name;
-    private String branch;
-    private Long mobNo;
-    private String gmail;
+    @Column(nullable = false)
+    private String domain;
 
-    public SubAdmin(){}
-    public SubAdmin(Long id, String name, String branch, Long mobNo, String gmail) {
-        this.id = id;
-        this.name = name;
-        this.branch = branch;
-        this.mobNo = mobNo;
-        this.gmail = gmail;
-    }
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public String getBranch() {
-        return branch;
-    }
-    public void setBranch(String branch) {
-        this.branch = branch;
-    }
-    public Long getMobNo() {
-        return mobNo;
-    }
-    public void setMobNo(Long mobNo) {
-        this.mobNo = mobNo;
-    }
-    public String getGmail() {
-        return gmail;
-    }
-    public void setGmail(String gmail) {
-        this.gmail = gmail;
-    }
+    // subAdminId  means (Id which provide by University or collage)
+    //unique domain wise
+    @Column(nullable = false)
+    private String subAdminId;
+
+    @Column(nullable = false)
+    private String name;
+    private String course;
+
+    @Column(nullable = false)
+    private String mobileNumber; //Country code +91
+
+   
+ 
+    @ManyToOne
+    @JoinColumn(name = "university_id")
+    private University university;
+    
 }

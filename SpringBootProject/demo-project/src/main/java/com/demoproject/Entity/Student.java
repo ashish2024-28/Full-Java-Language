@@ -1,106 +1,56 @@
 package com.demoproject.Entity;
 
+
+import com.demoproject.Entity.Home.University;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.Data;
 
 @Entity
-public class Student {
+@Table(name = "students", 
+uniqueConstraints = @UniqueConstraint(columnNames = "email")
+)
+@Data
+public class Student extends BaseUser {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @Column(nullable = false)
+    private String domain; // domain => university/collage ka unique name(like Haridwar University HU,hu,Hu)
 
-    private Long rollNo;
+    //unique domain wise
+    @Column(nullable = false)
+    private String rollNumber;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String course;
+    @Column(length = 50)
     private String branch;
+    @Column(nullable = false)
+    private String batch;
+
+    @Column(nullable = false)
+    private String mobileNumber;
+
+    @Column(nullable = false)
+    private String fatherName;
+    @Column(nullable = false)
+    private String fatherMobNo;
+
    
 
-    private String batch;
-    private Long mobNo;
-    private String gmail;
+    @ManyToOne
+    @JoinColumn(name = "university_id")
+    private University university;
 
-    // Default constructor (required)
-    public Student() {}
-
-    // Parameterized constructor
-    public Student(Long rollNo, String name, String course,String branch , String batch, Long mobNo, String gmail) {
-        this.rollNo = rollNo;
-        this.name = name;
-        this.course = course;
-        this.branch = branch;
-        this.batch = batch;
-        this.mobNo = mobNo;
-        this.gmail = gmail;
-    }
-
-    // GETTERS + SETTERS
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {  // REQUIRED for update
-        this.id = id;
-    }
-
-    public Long getRollNo() {
-        return rollNo;
-    }
-
-    public void setRollNo(Long rollNo) {
-        this.rollNo = rollNo;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getCourse() {
-        return course;
-    }
-
-    public void setCourse(String course) {
-        this.course = course;
-    }
-
-    public String getBranch() {
-        return branch;
-    }
-
-    public void setBranch(String branch) {
-        this.branch = branch;
-    }
-
-    public String getBatch() {
-        return batch;
-    }
-
-    public void setBatch(String batch) {
-        this.batch = batch;
-    }
-
-    public Long getMobNo() {
-        return mobNo;
-    }
-
-    public void setMobNo(Long mobNo) {
-        this.mobNo = mobNo;
-    }
-
-    public String getGmail() {
-        return gmail;
-    }
-
-    public void setGmail(String gmail) {
-        this.gmail = gmail;
-    }
+    
 }
+
 
 
 // | Annotation        | Meaning                           |

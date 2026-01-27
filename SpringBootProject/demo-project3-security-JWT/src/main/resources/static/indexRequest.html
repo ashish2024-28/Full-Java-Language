@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Welcom to my platform </h1>
+    <h2>here:</h2>
+    
+        <h3> DomainAdmin :- </h3>    
+        <ol> 
+            <li>@RequestMapping("/{domain}/-domainAdmin")</li>
+            <li>Student crud
+                <li>@GetMapping("/{domain}/students")</li>
+                <li>@PostMapping("/{domain}/student")</li>
+                <li>@GetMapping("/{domain}/student/{id}")</li>
+                <li>@PutMapping("/{domain}/student/{id}")</li>
+                <li>@DeleteMapping("/{domain}/student/{id}")</li>
+            </li>
+            <li>Facultly crud
+                <li>@GetMapping("/{domain}/faculties")</li>
+                <li>@PostMapping("/{domain}/faculty")</li>
+                <li>@GetMapping("/{domain}/faculty/{id}")</li>
+                <li>@PutMapping("/{domain}/faculty/{id}")</li>
+                <li>@DeleteMapping("/{domain}/faculty/{id}")</li>
+            </li>
+            <li>SubAdmin crud
+                    <li>@GetMapping("/{domain}/subadmins")</li>
+                    <li>@PostMapping("/{domain}/subadmin")</li>
+                    <li>@GetMapping("/{domain}/subadmin/{id}")</li>
+                    <li>@PutMapping("/{domain}/subadmin/{id}")</li>
+                    <li>@DeleteMapping("/{domain}/subadmin/{id}")</li>
+            </li>     
+        </ol>
+
+        <h3> University :- </h3>    
+        <ol> 
+            <li>/universities</li>
+            <li>@PostMapping("/adduniversity")</li>
+            <li> @GetMapping("/all")</li>
+            <li> @GetMapping("/{id:[0-9]+}")</li>
+            <li> @GetMapping("/{domain:[a-zA-Z]+}")</li>
+            <li> @PutMapping("/{id}")</li>
+            <li> @DeleteMapping("/{id}")</li>
+        </ol>
+        
+        <h3> subAdmin :- </h3>        
+        <ol> 
+            <li> @RequestMapping("/{domain}/subadmin")</li>
+            <li> @PostMapping("/add")</li>
+            <li> @GetMapping("/all")</li>
+            <li> @GetMapping("/{id:[0-9]+}")</li>
+            <li> @PutMapping("/{id:[0-9]+}")li>
+            <li> @DeleteMapping("/{id:[0-9]+}")</li>
+        </ol>
+        
+        <h3> Facultly:- </h3>        
+        <ol> 
+            <li> @RequestMapping("/{domain}/facultly")</li>
+            <li> @PostMapping("/add")</li>
+            <li> @GetMapping("/all")</li>
+            <li> @GetMapping("/{id:[0-9]+}")</li>
+            <li> @PutMapping("/{id:[0-9]+}")li>
+            <li> @DeleteMapping("/{id:[0-9]+}")</li>
+        </ol>
+        
+        <h3> Student :- </h3>        
+        <ol> 
+            <li> @RequestMapping("/{domain}/student")</li>
+            <li> @PostMapping("/add")</li>
+            <li> @GetMapping("/all")</li>
+            <li> @GetMapping("/{id:[0-9]+}")</li>
+            <li> @PutMapping("/{id:[0-9]+}")li>
+            <li> @DeleteMapping("/{id:[0-9]+}")</li>
+        </ol>
+        
+    
+</body>
+</html>

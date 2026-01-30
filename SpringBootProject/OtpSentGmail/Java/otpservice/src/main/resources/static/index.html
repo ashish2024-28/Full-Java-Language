@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OTP Verification</title>
+  <style>
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <h2>Send OTP</h2>
+  <input type="email" id="email" placeholder="Enter your email">
+  <button id="sendBtn" onclick="sendOtp()">Send OTP</button>
+
+  <br><br>
+  <h2>Verify OTP</h2>
+  <input type="text" id="otp" placeholder="Enter OTP">
+  <button onclick="verifyOtp()">Verify</button>
+
+  <p id="result"></p>
+
+  <script>
+    const baseUrl = "http://localhost:8080/otp";
+
+    async function sendOtp() {
+      const email = document.getElementById("email").value;
+      const btn = document.getElementById("sendBtn");
+      const result = document.getElementById("result");
+
+      if (!email) {
+        result.innerText = "⚠️ Please enter your email first!";
+        return;
+      }
+
+      // Disable button for 30 seconds
+      btn.disabled = true;
+      btn.innerText = "Sending...";
+
+      try {
+        const res = await fetch(`${baseUrl}/send?email=${email}`, { method: "POST" });
+        const text = await res.text();
+        result.innerText = text;
+      } catch (err) {
+        result.innerText = "❌ Error sending OTP!";
+      }
+
+      // Wait 30 seconds before enabling button again
+      let seconds = 30;
+      const interval = setInterval(() => {
+        btn.innerText = `Wait ${seconds--}s`;
+        if (seconds < 0) {
+          clearInterval(interval);
+          btn.disabled = false;
+          btn.innerText = "Send OTP";
+        }
+      }, 1000);
+    }
+
+    async function verifyOtp() {
+      const email = document.getElementById("email").value;
+      const otp = document.getElementById("otp").value;
+      const result = document.getElementById("result");
+
+      if (!otp) {
+        result.innerText = "⚠️ Enter your OTP first!";
+        return;
+      }
+
+      try {
+        const res = await fetch(`${baseUrl}/verify?email=${email}&otp=${otp}`, { method: "POST" });
+        const text = await res.text();
+        result.innerText = text;
+      } catch (err) {
+        result.innerText = "❌ Error verifying OTP!";
+      }
+    }
+  </script>
+</body>
+</html>

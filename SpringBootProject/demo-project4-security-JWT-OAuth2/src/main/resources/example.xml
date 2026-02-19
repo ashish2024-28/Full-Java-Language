@@ -1,0 +1,23 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: YOUR_GOOGLE_CLIENT_ID
+            client-secret: YOUR_GOOGLE_CLIENT_SECRET
+            scope:
+              - openid
+              - email
+              - profile
+          github:
+            client-id: YOUR_GITHUB_CLIENT_ID
+            client-secret: YOUR_GITHUB_CLIENT_SECRET
+            # ❌ DO NOT include 'openid' here
+            scope:
+              - read:user
+              - user:email
+        provider:
+          github:
+            # ✅ Tell Spring to use 'id' instead of 'sub'
+            user-name-attribute: id

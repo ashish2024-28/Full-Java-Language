@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: External API Integration 
+
+
+weather:api:key: 0ea8387883bc2d3be71ca3c3decbc965
